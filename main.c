@@ -12,10 +12,11 @@
 #include "systick.h"
 #include "string.h"
 
-// // ÉÁË¸ÑÓÊ±
-#define FASTFLASHTIME 300000
-#define SLOWFLASHTIME (FASTFLASHTIME * 20)
-#define STOPFLASHTIME 0
+// // ï¿½ï¿½Ë¸ï¿½ï¿½Ê±
+#define FAST_SCROLL_TIME_MS 200U
+#define SLOW_SCROLL_TIME_MS 800U
+#define STOP_SCROLL_TIME_MS 0U
+#define SEG7_DIGITS 8U
 
 //*****************************************************************************
 //
@@ -44,22 +45,25 @@
 
 
 uint8_t str_buffer[] = "523010910148";
-uint8_t str_len;
-int dir = 1;
-uint8_t window_pos = 0;
+uint8_t str_len = sizeof(str_buffer) - 1U;
+volatile int8_t dir = 1;
+volatile uint8_t window_pos = 0;
 uint32_t ui32SysClock;
 uint32_t pj0_val = 0;
 uint32_t pj1_val = 0;
 
-uint8_t index = 0;
+volatile uint8_t index = 0;
 
-uint32_t delay_time = 0;
+volatile uint32_t delay_time = FAST_SCROLL_TIME_MS;
+volatile uint32_t scroll_tick = 0;
 
-bool time_flag_1ms = false;
+volatile bool time_flag_1ms = false;
 
-enum SPEEDLEVEL { FAST, STOP, SLOW } speed_level;
+enum SPEEDLEVEL { FAST, STOP, SLOW } speed_level = FAST;
 
 void LED_Flash(enum SPEEDLEVEL speed_level);
+void SetScrollSpeed(enum SPEEDLEVEL level);
+void MoveWindow(void);
 uint32_t SystemClock_PLL(void);
 
 void S800_SysTick_Init(void);
@@ -80,26 +84,13 @@ int main(void) {
 
     S800_GPIO_Init();
     S800_I2C0_Init();
+    SetScrollSpeed(speed_level);
     S800_SysTick_Init();
 
     while (1) {
-        int i;
-        for (i = 0; i < 8; i++) {
-            // ÊýÂë¹ÜµÚÒ»Î»ÏÔÊ¾ 1~8
-            result = I2C0_WriteByte(TCA6424_I2CADDR, TCA6424_OUTPUT_PORT1, data);
-
-            result = I2C0_WriteByte(TCA6424_I2CADDR, TCA6424_OUTPUT_PORT2, num);
-
-            // LED1~LED8 ÒÀ´ÎµãÁÁ
-            // PCA9557 ¿ØÖÆ LED ÎªµÍµçÆ½µãÁÁ£¬ËùÒÔÓÃ ~(1 << i)
-            result = I2C0_WriteByte(PCA9557_I2CADDR, PCA9557_OUTPUT, (uint8_t) (~(1 << i)));
-
-            Delay(800000);
-        }
-
         if (time_flag_1ms) {
             time_flag_1ms = false;
-            // ¶ÁÈ¡°´¼ü
+            // read keys
             if (is_key_Pressed(GPIO_PORTJ_BASE, GPIO_PIN_0)) { // sw1
                 dir = -dir;
             }
@@ -115,20 +106,18 @@ int main(void) {
                         speed_level = FAST;
                         break;
                 }
+                SetScrollSpeed(speed_level);
             }
-            // LED_Flash(speed_level);
-
-            window_pos += dir;
         }
     }
 }
 
 bool is_key_Pressed(uint32_t ui32Port, uint8_t ui8Pins) {
     if (GPIOPinRead(ui32Port, ui8Pins) == 0) {
-        DelayMs(10); // Ïû¶¶ÑÓÊ±
+        DelayMs(10); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±
 
         if (GPIOPinRead(ui32Port, ui8Pins) == 0) {
-            // µÈ´ýËÉÊÖ£¬±ÜÃâÒ»´Î°´ÏÂ´¥·¢¶à´Î
+            // ï¿½È´ï¿½ï¿½ï¿½ï¿½Ö£ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Î°ï¿½ï¿½Â´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             while (GPIOPinRead(ui32Port, ui8Pins) == 0) {
             }
             DelayMs(10);
@@ -139,24 +128,30 @@ bool is_key_Pressed(uint32_t ui32Port, uint8_t ui8Pins) {
 }
 
 
-// LED ¸ù¾Ý°´¼üÉÁË¸
+// LED ï¿½ï¿½ï¿½Ý°ï¿½ï¿½ï¿½ï¿½ï¿½Ë¸
 void LED_Flash(enum SPEEDLEVEL speed_level) {
-    switch (speed_level) {
+    SetScrollSpeed(speed_level);
+
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 1);
+    DelayMs(delay_time);
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0);
+    DelayMs(delay_time);
+}
+
+void SetScrollSpeed(enum SPEEDLEVEL level) {
+    switch (level) {
         case FAST:
-            delay_time = FASTFLASHTIME;
+            delay_time = FAST_SCROLL_TIME_MS;
             break;
         case SLOW:
-            delay_time = SLOWFLASHTIME;
+            delay_time = SLOW_SCROLL_TIME_MS;
             break;
         case STOP:
-            delay_time = STOPFLASHTIME;
+            delay_time = STOP_SCROLL_TIME_MS;
             break;
     }
 
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 1);
-    Delay(delay_time);
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0);
-    Delay(delay_time);
+    scroll_tick = 0;
 }
 
 void S800_GPIO_Init(void) {
@@ -174,12 +169,12 @@ void S800_GPIO_Init(void) {
 
 void S800_I2C0_Init(void) {
 
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0); // ³õÊ¼»¯i2cÄ£¿é
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB); // Ê¹ÓÃI2CÄ£¿é0£¬Òý½ÅÅäÖÃÎªI2C0SCL--PB2¡¢I2C0SDA--PB3
-    GPIOPinConfigure(GPIO_PB2_I2C0SCL); // ÅäÖÃPB2ÎªI2C0SCL
-    GPIOPinConfigure(GPIO_PB3_I2C0SDA); // ÅäÖÃPB3ÎªI2C0SDA
-    GPIOPinTypeI2CSCL(GPIO_PORTB_BASE, GPIO_PIN_2); // I2C½«GPIO_PIN_2ÓÃ×÷SCL
-    GPIOPinTypeI2C(GPIO_PORTB_BASE, GPIO_PIN_3); // I2C½«GPIO_PIN_3ÓÃ×÷SDA
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0); // ï¿½ï¿½Ê¼ï¿½ï¿½i2cÄ£ï¿½ï¿½
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB); // Ê¹ï¿½ï¿½I2CÄ£ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªI2C0SCL--PB2ï¿½ï¿½I2C0SDA--PB3
+    GPIOPinConfigure(GPIO_PB2_I2C0SCL); // ï¿½ï¿½ï¿½ï¿½PB2ÎªI2C0SCL
+    GPIOPinConfigure(GPIO_PB3_I2C0SDA); // ï¿½ï¿½ï¿½ï¿½PB3ÎªI2C0SDA
+    GPIOPinTypeI2CSCL(GPIO_PORTB_BASE, GPIO_PIN_2); // I2Cï¿½ï¿½GPIO_PIN_2ï¿½ï¿½ï¿½ï¿½SCL
+    GPIOPinTypeI2C(GPIO_PORTB_BASE, GPIO_PIN_3); // I2Cï¿½ï¿½GPIO_PIN_3ï¿½ï¿½ï¿½ï¿½SDA
 
     I2CMasterInitExpClk(I2C0_BASE, ui32SysClock, true); // config I2C0 400k
     I2CMasterEnable(I2C0_BASE);
@@ -195,26 +190,26 @@ void S800_I2C0_Init(void) {
 uint8_t I2C0_WriteByte(uint8_t DevAddr, uint8_t RegAddr, uint8_t WriteData) {
     uint8_t rop;
     while (I2CMasterBusy(I2C0_BASE)) {
-    }; // Èç¹ûI2C0Ä£¿éÃ¦£¬µÈ´ý
+    }; // ï¿½ï¿½ï¿½I2C0Ä£ï¿½ï¿½Ã¦ï¿½ï¿½ï¿½È´ï¿½
     //
     I2CMasterSlaveAddrSet(I2C0_BASE, DevAddr, false);
-    // ÉèÖÃÖ÷»úÒª·Åµ½×ÜÏßÉÏµÄ´Ó»úµØÖ·¡£false±íÊ¾Ö÷»úÐ´´Ó»ú£¬true±íÊ¾Ö÷»ú¶Á´Ó»ú
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Åµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÄ´Ó»ï¿½ï¿½ï¿½Ö·ï¿½ï¿½falseï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½Ð´ï¿½Ó»ï¿½ï¿½ï¿½trueï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó»ï¿½
 
-    I2CMasterDataPut(I2C0_BASE, RegAddr); // Ö÷»úÐ´Éè±¸¼Ä´æÆ÷µØÖ·
-    I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_START); // Ö´ÐÐÖØ¸´Ð´Èë²Ù×÷
+    I2CMasterDataPut(I2C0_BASE, RegAddr); // ï¿½ï¿½ï¿½ï¿½Ð´ï¿½è±¸ï¿½Ä´ï¿½ï¿½ï¿½ï¿½ï¿½Ö·
+    I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_START); // Ö´ï¿½ï¿½ï¿½Ø¸ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½
     while (I2CMasterBusy(I2C0_BASE)) {
     };
 
-    rop = (uint8_t) I2CMasterErr(I2C0_BASE); // µ÷ÊÔÓÃ
+    rop = (uint8_t) I2CMasterErr(I2C0_BASE); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
     I2CMasterDataPut(I2C0_BASE, WriteData);
-    I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_FINISH); // Ö´ÐÐÖØ¸´Ð´Èë²Ù×÷²¢½áÊø
+    I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_FINISH); // Ö´ï¿½ï¿½ï¿½Ø¸ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     while (I2CMasterBusy(I2C0_BASE)) {
     };
 
-    rop = (uint8_t) I2CMasterErr(I2C0_BASE); // µ÷ÊÔÓÃ
+    rop = (uint8_t) I2CMasterErr(I2C0_BASE); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    return rop; // ·µ»Ø´íÎóÀàÐÍ£¬ÎÞ´í·µ»Ø0
+    return rop; // ï¿½ï¿½ï¿½Ø´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½Þ´ï¿½ï¿½ï¿½ï¿½0
 }
 
 uint8_t I2C0_ReadByte(uint8_t DevAddr, uint8_t RegAddr) {
@@ -224,17 +219,17 @@ uint8_t I2C0_ReadByte(uint8_t DevAddr, uint8_t RegAddr) {
     I2CMasterSlaveAddrSet(I2C0_BASE, DevAddr, false);
     I2CMasterDataPut(I2C0_BASE, RegAddr);
     //	I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_START);
-    I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_SINGLE_SEND); // Ö´ÐÐµ¥´ÊÐ´Èë²Ù×÷
+    I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_SINGLE_SEND); // Ö´ï¿½Ðµï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½
     while (I2CMasterBusBusy(I2C0_BASE))
         ;
     rop = (uint8_t) I2CMasterErr(I2C0_BASE);
     Delay(1);
     // receive data
-    I2CMasterSlaveAddrSet(I2C0_BASE, DevAddr, true); // ÉèÖÃ´Ó»úµØÖ·
-    I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_SINGLE_RECEIVE); // Ö´ÐÐµ¥´Î¶Á²Ù×÷
+    I2CMasterSlaveAddrSet(I2C0_BASE, DevAddr, true); // ï¿½ï¿½ï¿½Ã´Ó»ï¿½ï¿½ï¿½Ö·
+    I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_SINGLE_RECEIVE); // Ö´ï¿½Ðµï¿½ï¿½Î¶ï¿½ï¿½ï¿½ï¿½ï¿½
     while (I2CMasterBusBusy(I2C0_BASE))
         ;
-    value = I2CMasterDataGet(I2C0_BASE); // »ñÈ¡¶ÁÈ¡µÄÊý¾Ý
+    value = I2CMasterDataGet(I2C0_BASE); // ï¿½ï¿½È¡ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     Delay(1);
     return value;
 }
@@ -244,14 +239,14 @@ void DelayMs(uint32_t ms) { SysCtlDelay((SysCtlClockGet() / 3000) * ms); }
 
 // PLL 20 MHz
 uint32_t SystemClock_PLL(void) {
-    // Ê¹ÓÃÍâ²¿ 25 MHz ¾§Õñ£¬PLL Êä³ö 480 MHz VCO£¬·ÖÆµµÃµ½ 20 MHz
+    // Ê¹ï¿½ï¿½ï¿½â²¿ 25 MHz ï¿½ï¿½ï¿½ï¿½PLL ï¿½ï¿½ï¿½ 480 MHz VCOï¿½ï¿½ï¿½ï¿½Æµï¿½Ãµï¿½ 20 MHz
     uint32_t freq =
             SysCtlClockFreqSet(SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480 | SYSCTL_XTAL_25MHZ, 20000000);
     return freq;
 }
 
 void S800_SysTick_Init(void) {
-    // 20MHz Ê±ÖÓ£¬1msÖÐ¶ÏÒ»´Î
+    // 20MHz Ê±ï¿½Ó£ï¿½1msï¿½Ð¶ï¿½Ò»ï¿½ï¿½
     SysTickPeriodSet(ui32SysClock / 1000);
 
     SysTickIntEnable();
@@ -283,14 +278,36 @@ uint8_t Seg7Code_FromAscii(char ch) {
         case '9':
             return 0x6f; // 0b01101111
         default:
-            return 0x00; // ²»ÏÔÊ¾
+            return 0x00; // ï¿½ï¿½ï¿½ï¿½Ê¾
     }
 }
 
+void MoveWindow(void) {
+    if (dir > 0) {
+        window_pos++;
+
+        if (window_pos >= str_len) {
+            window_pos = 0;
+        }
+    } else {
+        if (window_pos == 0) {
+            window_pos = str_len - 1U;
+        } else {
+            window_pos--;
+        }
+    }
+}
 void SysTick_Handler(void) {
     time_flag_1ms = true;
 
-    str_len = sizeof(str_buffer)-1;
+    if (delay_time != STOP_SCROLL_TIME_MS) {
+        scroll_tick++;
+
+        if (scroll_tick >= delay_time) {
+            scroll_tick = 0;
+            MoveWindow();
+        }
+    }
 
     uint8_t char_pos = (window_pos + index) % str_len;
 
@@ -298,16 +315,14 @@ void SysTick_Handler(void) {
 
     result = I2C0_WriteByte(TCA6424_I2CADDR, TCA6424_OUTPUT_PORT2, (uint8_t) (1 << index));
 
-    // LED1~LED8 ÒÀ´ÎµãÁÁ£¬µÍµçÆ½µãÁÁ
-    result = I2C0_WriteByte(PCA9557_I2CADDR, PCA9557_OUTPUT, (uint8_t) (~(1 << window_pos)));
+    result = I2C0_WriteByte(PCA9557_I2CADDR, PCA9557_OUTPUT, (uint8_t) (~(1 << (window_pos % SEG7_DIGITS))));
 
     index++;
 
-    if (index >= 8) {
+    if (index >= SEG7_DIGITS) {
         index = 0;
     }
 }
-
 
 void Delay(uint32_t value) {
     uint32_t ui32Loop;
