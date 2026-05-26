@@ -56,6 +56,8 @@ volatile uint8_t index = 0;
 
 volatile uint32_t delay_time = FAST_SCROLL_TIME_MS;
 volatile uint32_t scroll_tick = 0;
+volatile uint32_t pf0_tick = 0;
+volatile bool pf0_on = false;
 
 volatile bool time_flag_1ms = false;
 
@@ -152,6 +154,9 @@ void SetScrollSpeed(enum SPEEDLEVEL level) {
     }
 
     scroll_tick = 0;
+    pf0_tick = 0;
+    pf0_on = false;
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0);
 }
 
 void S800_GPIO_Init(void) {
@@ -302,11 +307,22 @@ void SysTick_Handler(void) {
 
     if (delay_time != STOP_SCROLL_TIME_MS) {
         scroll_tick++;
+        pf0_tick++;
 
         if (scroll_tick >= delay_time) {
             scroll_tick = 0;
             MoveWindow();
         }
+
+        if (pf0_tick >= delay_time) {
+            pf0_tick = 0;
+            pf0_on = !pf0_on;
+            GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, pf0_on ? GPIO_PIN_0 : 0);
+        }
+    } else if (pf0_on || pf0_tick != 0) {
+        pf0_tick = 0;
+        pf0_on = false;
+        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0);
     }
 
     uint8_t char_pos = (window_pos + index) % str_len;
