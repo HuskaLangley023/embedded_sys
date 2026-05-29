@@ -13,8 +13,9 @@ void SysTick_Handler(void) {
         pf0_tick++;
 
         if (scroll_tick >= delay_time) {
-            scroll_tick = 0;
             MoveWindow();
+            scroll_tick = 0;
+            I2C0_WriteByte(PCA9557_I2CADDR, PCA9557_OUTPUT, (uint8_t) (~(1 << (window_pos % SEG7_DIGITS))));
         }
 
         if (pf0_tick >= delay_time) {
@@ -30,11 +31,11 @@ void SysTick_Handler(void) {
 
     uint8_t char_pos = (window_pos + index) % str_len;
 
+    I2C0_WriteByte(TCA6424_I2CADDR, TCA6424_OUTPUT_PORT2, 0x00);
+    // Delay(1);
     I2C0_WriteByte(TCA6424_I2CADDR, TCA6424_OUTPUT_PORT1, Seg7Code_FromAscii(str_buffer[char_pos]));
 
     I2C0_WriteByte(TCA6424_I2CADDR, TCA6424_OUTPUT_PORT2, (uint8_t) (1 << index));
-
-    I2C0_WriteByte(PCA9557_I2CADDR, PCA9557_OUTPUT, (uint8_t) (~(1 << (window_pos % SEG7_DIGITS))));
 
     index++;
 
