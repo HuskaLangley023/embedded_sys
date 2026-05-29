@@ -44,7 +44,7 @@
 #define TCA6424_OUTPUT_PORT2 0x06
 
 
-uint8_t str_buffer[] = "523010910148";
+uint8_t str_buffer[] = "s523010910148zhuyixiao";
 uint8_t str_len = sizeof(str_buffer) - 1U;
 volatile int8_t dir = 1;
 volatile uint8_t window_pos = 0;
@@ -282,6 +282,24 @@ uint8_t Seg7Code_FromAscii(char ch) {
             return 0x7f; // 0b01111111
         case '9':
             return 0x6f; // 0b01101111
+        case 'z':
+            return 0x5b; // close to 2
+        case 'h':
+            return 0x74;
+        case 'u':
+            return 0x1c;
+        case 'y':
+            return 0x6e;
+        case 'i':
+            return 0x04;
+        case 'x':
+            return 0x76; // close to H
+        case 'a':
+            return 0x77;
+        case 'o':
+            return 0x5c;
+        case 's':
+            return 0x6d; // close to 5
         default:
             return 0x00; // ����ʾ
     }
