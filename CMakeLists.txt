@@ -121,4 +121,6 @@ add_executable(lab1
         main.h
         control_loop.h
         control_loop.c
+        s800_uart.h
+        s800_uart.c
 )

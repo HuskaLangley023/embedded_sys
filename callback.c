@@ -4,6 +4,7 @@
 #include "main.h"
 #include "s800_i2c.h"
 #include "flash_led.h"
+#include "s800_uart.h"
 
 void SysTick_Handler(void) {
     time_flag_1ms = true;
@@ -42,4 +43,25 @@ void SysTick_Handler(void) {
     if (index >= SEG7_DIGITS) {
         index = 0;
     }
+}
+
+uint32_t rx_buf;
+void UART0_Handler(void)
+{
+    int32_t uart0_int_status;
+    uart0_int_status 	= UARTIntStatus(UART0_BASE, true);
+    // 根据返回值uart0_int_status可以判断中断事件是接收中断、接收超时中断或发送中断等。详见本函数结束后的注释
+    //本例程只适用于接收最多8字节的情形，满足实验指导书的要求。
+    //若接收大于8字节例如10个字节，要在正常接收中断中接收8个字节，在超时接收中断中接收2个字节。
+    UARTIntClear(UART0_BASE, uart0_int_status);				//Clear the asserted interrupts
+
+    while(UARTCharsAvail(UART0_BASE))    		// Loop while there are characters in the receive FIFO.
+    {
+        ///Read the next character from the UART and write it back to the UART.
+        rx_buf = UARTCharGetNonBlocking(UART0_BASE);
+        UARTCharPutNonBlocking(UART0_BASE, rx_buf);  //非阻塞方式UART接收和发送
+        GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1,GPIO_PIN_1 );
+        //		Delay(1000);
+    }
+    GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1,0 );
 }

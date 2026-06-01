@@ -16,3 +16,6 @@
 .\objects\main.o: .\driverlib\i2c.h
 .\objects\main.o: flash_led.h
 .\objects\main.o: control_loop.h
+.\objects\main.o: s800_uart.h
+.\objects\main.o: .\driverlib\uart.h
+.\objects\main.o: .\inc\hw_ints.h
