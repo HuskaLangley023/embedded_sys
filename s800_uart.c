@@ -5,10 +5,7 @@
 #include "flash_led.h"
 #include "hw_ints.h"
 
-#include <stdio.h>
-
 #define UART_CMD_MAX_LEN 64U
-#define UART_RESPONSE_MAX_LEN 96U
 #define UART_SPEED_MAX_MS 9999U
 
 static volatile char uart_cmd_buf[UART_CMD_MAX_LEN + 1U];
@@ -17,7 +14,7 @@ static volatile bool uart_cmd_ready = false;
 static volatile bool uart_cmd_overflow = false;
 static volatile bool uart_cmd_overflow_ready = false;
 
-static uint8_t uart_mode = UART_MODE_LOCAL;
+static volatile uint8_t uart_mode = UART_MODE_LOCAL;
 
 static bool AsciiIsSpace(char ch)
 {
@@ -73,6 +70,42 @@ static bool StartsWithIgnoreCase(const char *text, const char *prefix)
         prefix++;
     }
     return true;
+}
+
+static void UInt32ToDec(uint32_t value, char *buf, uint32_t buf_size)
+{
+    uint32_t divisor;
+    uint32_t pos;
+    bool started;
+    uint8_t digit;
+
+    if (buf_size == 0U) {
+        return;
+    }
+
+    pos = 0;
+    if (value == 0U) {
+        if (buf_size > 1U) {
+            buf[pos++] = '0';
+        }
+        buf[pos] = '\0';
+        return;
+    }
+
+    started = false;
+    divisor = 1000000000UL;
+    while (divisor > 0U) {
+        digit = (uint8_t)(value / divisor);
+        if (digit != 0U || started) {
+            started = true;
+            if ((pos + 1U) < buf_size) {
+                buf[pos++] = (char)('0' + digit);
+            }
+        }
+        value %= divisor;
+        divisor /= 10U;
+    }
+    buf[pos] = '\0';
 }
 
 static bool FetchCommand(char *command, uint32_t command_size, bool *overflow)
@@ -188,22 +221,43 @@ static void FormatSpeed(char *buf, uint32_t buf_size)
     uint32_t ms = delay_time;
     uint32_t seconds = ms / 1000U;
     uint32_t fraction = ms % 1000U;
+    uint32_t pos;
+    uint32_t int_pos;
+    uint8_t frac_len;
+    char int_buf[11];
     char frac_buf[4];
-    int i;
 
-    if (fraction == 0U) {
-        snprintf(buf, buf_size, "%lu", (unsigned long)seconds);
+    if (buf_size == 0U) {
         return;
     }
 
-    snprintf(frac_buf, sizeof(frac_buf), "%03lu", (unsigned long)fraction);
-    for (i = 2; i > 0; i--) {
-        if (frac_buf[i] != '0') {
-            break;
-        }
-        frac_buf[i] = '\0';
+    UInt32ToDec(seconds, int_buf, sizeof(int_buf));
+
+    pos = 0;
+    int_pos = 0;
+    while (int_buf[int_pos] != '\0' && (pos + 1U) < buf_size) {
+        buf[pos++] = int_buf[int_pos++];
     }
-    snprintf(buf, buf_size, "%lu.%s", (unsigned long)seconds, frac_buf);
+
+    if (fraction != 0U && (pos + 1U) < buf_size) {
+        frac_buf[0] = (char)('0' + (fraction / 100U));
+        frac_buf[1] = (char)('0' + ((fraction / 10U) % 10U));
+        frac_buf[2] = (char)('0' + (fraction % 10U));
+        frac_buf[3] = '\0';
+
+        frac_len = 3U;
+        while (frac_len > 1U && frac_buf[frac_len - 1U] == '0') {
+            frac_len--;
+        }
+
+        buf[pos++] = '.';
+        int_pos = 0;
+        while (int_pos < frac_len && (pos + 1U) < buf_size) {
+            buf[pos++] = frac_buf[int_pos++];
+        }
+    }
+
+    buf[pos] = '\0';
 }
 
 static void SendLine(const char *message)
@@ -215,34 +269,35 @@ static void SendLine(const char *message)
 static void SendStatus(void)
 {
     char speed[16];
-    char response[UART_RESPONSE_MAX_LEN];
 
     FormatSpeed(speed, sizeof(speed));
-    snprintf(response, sizeof(response), "STATUS:MODE=%u,SPEED=%s",
-             (unsigned int)uart_mode, speed);
-    SendLine(response);
+    UARTStringPut("STATUS:MODE=");
+    UARTStringPut((uart_mode == UART_MODE_CONTROL) ? "1" : "0");
+    UARTStringPut(",SPEED=");
+    UARTStringPut(speed);
+    UARTStringPut("\r\n");
 }
 
 static void SendSpeed(void)
 {
     char speed[16];
-    char response[UART_RESPONSE_MAX_LEN];
 
     FormatSpeed(speed, sizeof(speed));
-    snprintf(response, sizeof(response), "SPEED:%s", speed);
-    SendLine(response);
+    UARTStringPut("SPEED:");
+    UARTStringPut(speed);
+    UARTStringPut("\r\n");
 }
 
-static void ExecuteCommand(const char *command)
+static bool ExecuteCommand(const char *command)
 {
     if (EqualsIgnoreCase(command, "GET STATUS")) {
         SendStatus();
-        return;
+        return true;
     }
 
     if (EqualsIgnoreCase(command, "GET SPEED")) {
         SendSpeed();
-        return;
+        return true;
     }
 
     if (StartsWithIgnoreCase(command, "SET MODE")) {
@@ -250,17 +305,22 @@ static void ExecuteCommand(const char *command)
 
         if (!AsciiIsSpace(command[8])) {
             SendLine("ERROR: INVALID PARAM");
-            return;
+            return false;
         }
 
         if (!ParseModeParam(command + 8, &mode)) {
             SendLine("ERROR: INVALID PARAM");
-            return;
+            return false;
         }
 
         uart_mode = mode;
+        if (uart_mode == UART_MODE_LOCAL) {
+            PF0_ResetLocalMode();
+        } else {
+            PF0_ResetUartMode();
+        }
         SendStatus();
-        return;
+        return true;
     }
 
     if (StartsWithIgnoreCase(command, "SET DISP")) {
@@ -268,22 +328,22 @@ static void ExecuteCommand(const char *command)
 
         if (!AsciiIsSpace(command[8])) {
             SendLine("ERROR: INVALID PARAM");
-            return;
+            return false;
         }
 
         if (uart_mode != UART_MODE_CONTROL) {
             SendLine("ERROR: NOT IN UART MODE");
-            return;
+            return false;
         }
 
         if (!ValidateDisplayText(text)) {
             SendLine("ERROR: INVALID PARAM");
-            return;
+            return false;
         }
 
         SetDisplayText(text);
         SendLine("OK");
-        return;
+        return true;
     }
 
     if (StartsWithIgnoreCase(command, "SET SPEED")) {
@@ -291,25 +351,26 @@ static void ExecuteCommand(const char *command)
 
         if (!AsciiIsSpace(command[9])) {
             SendLine("ERROR: INVALID PARAM");
-            return;
+            return false;
         }
 
         if (uart_mode != UART_MODE_CONTROL) {
             SendLine("ERROR: NOT IN UART MODE");
-            return;
+            return false;
         }
 
         if (!ParseSpeedMs(command + 9, &speed_ms)) {
             SendLine("ERROR: INVALID PARAM");
-            return;
+            return false;
         }
 
         SetScrollDelayMs(speed_ms);
         SendSpeed();
-        return;
+        return true;
     }
 
     SendLine("ERROR: INVALID COMMAND");
+    return false;
 }
 
 void UARTStringPut(const char *cMessage)
@@ -364,6 +425,7 @@ void UARTCommand_Process(void)
 {
     char command[UART_CMD_MAX_LEN + 1U];
     bool overflow;
+    bool command_ok;
 
     if (!FetchCommand(command, sizeof(command), &overflow)) {
         return;
@@ -371,10 +433,20 @@ void UARTCommand_Process(void)
 
     if (overflow) {
         SendLine("ERROR: BUFFER OVERFLOW");
+        if (uart_mode == UART_MODE_CONTROL) {
+            PF0_RecordUartCommandError();
+        }
         return;
     }
 
-    ExecuteCommand(command);
+    command_ok = ExecuteCommand(command);
+    if (uart_mode == UART_MODE_CONTROL) {
+        if (command_ok) {
+            PF0_RecordUartCommandSuccess();
+        } else {
+            PF0_RecordUartCommandError();
+        }
+    }
 }
 
 uint8_t UARTCommand_GetMode(void)

@@ -3,6 +3,14 @@
 //
 #include "flash_led.h"
 
+#define PF0_UART_SUCCESS_INTERVAL_MS 80U
+#define PF0_UART_SUCCESS_TOGGLE_COUNT 4U
+#define PF0_UART_ERROR_INTERVAL_MS 500U
+
+#define PF0_UART_IDLE 0U
+#define PF0_UART_SUCCESS 1U
+#define PF0_UART_ERROR 2U
+
 volatile uint8_t index = 0;
 
 uint8_t str_buffer[DISPLAY_BUFFER_MAX_LEN + 1U] = "s523010910148zhuyixiao";
@@ -16,6 +24,14 @@ volatile uint32_t pf0_tick = 0;
 volatile bool pf0_on = false;
 
 enum SPEEDLEVEL speed_level = FAST;
+
+static volatile uint8_t pf0_uart_state = PF0_UART_IDLE;
+static volatile uint8_t pf0_uart_success_toggle_count = 0;
+
+static void PF0_Write(bool on) {
+    pf0_on = on;
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, on ? GPIO_PIN_0 : 0);
+}
 
 bool is_key_Pressed(uint32_t ui32Port, uint8_t ui8Pins) {
     if (GPIOPinRead(ui32Port, ui8Pins) == 0) {
@@ -56,8 +72,7 @@ void SetScrollSpeed(enum SPEEDLEVEL level) {
 
     scroll_tick = 0;
     pf0_tick = 0;
-    pf0_on = false;
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0);
+    PF0_Write(false);
 }
 
 bool SetDisplayText(const char *text) {
@@ -98,8 +113,72 @@ void SetScrollDelayMs(uint32_t delay_ms) {
 
     scroll_tick = 0;
     pf0_tick = 0;
-    pf0_on = false;
-    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0);
+    PF0_Write(false);
+}
+
+void PF0_UpdateLocalMode(void) {
+    if (delay_time != STOP_SCROLL_TIME_MS) {
+        pf0_tick++;
+        if (pf0_tick >= delay_time) {
+            pf0_tick = 0;
+            PF0_Write(!pf0_on);
+        }
+    } else if (pf0_on || pf0_tick != 0) {
+        pf0_tick = 0;
+        PF0_Write(false);
+    }
+}
+
+void PF0_UpdateUartMode(void) {
+    if (pf0_uart_state == PF0_UART_SUCCESS) {
+        pf0_tick++;
+        if (pf0_tick >= PF0_UART_SUCCESS_INTERVAL_MS) {
+            pf0_tick = 0;
+            pf0_uart_success_toggle_count++;
+            PF0_Write(!pf0_on);
+
+            if (pf0_uart_success_toggle_count >= PF0_UART_SUCCESS_TOGGLE_COUNT) {
+                pf0_uart_state = PF0_UART_IDLE;
+                pf0_uart_success_toggle_count = 0;
+                PF0_Write(false);
+            }
+        }
+    } else if (pf0_uart_state == PF0_UART_ERROR) {
+        pf0_tick++;
+        if (pf0_tick >= PF0_UART_ERROR_INTERVAL_MS) {
+            pf0_tick = 0;
+            PF0_Write(!pf0_on);
+        }
+    } else if (pf0_on || pf0_tick != 0) {
+        pf0_tick = 0;
+        PF0_Write(false);
+    }
+}
+
+void PF0_ResetLocalMode(void) {
+    pf0_tick = 0;
+    PF0_Write(false);
+}
+
+void PF0_ResetUartMode(void) {
+    pf0_uart_state = PF0_UART_IDLE;
+    pf0_uart_success_toggle_count = 0;
+    pf0_tick = 0;
+    PF0_Write(false);
+}
+
+void PF0_RecordUartCommandSuccess(void) {
+    pf0_uart_state = PF0_UART_SUCCESS;
+    pf0_uart_success_toggle_count = 0;
+    pf0_tick = 0;
+    PF0_Write(true);
+}
+
+void PF0_RecordUartCommandError(void) {
+    pf0_uart_state = PF0_UART_ERROR;
+    pf0_uart_success_toggle_count = 0;
+    pf0_tick = 0;
+    PF0_Write(true);
 }
 
 uint8_t Seg7Code_FromAscii(char ch) {

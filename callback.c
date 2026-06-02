@@ -13,23 +13,18 @@ void SysTick_Handler(void) {
 
     if (delay_time != STOP_SCROLL_TIME_MS) {
         scroll_tick++;
-        pf0_tick++;
 
         if (scroll_tick >= delay_time) {
             MoveWindow();
             scroll_tick = 0;
             I2C0_WriteByte(PCA9557_I2CADDR, PCA9557_OUTPUT, (uint8_t) (~(1 << (window_pos % SEG7_DIGITS))));
         }
+    }
 
-        if (pf0_tick >= delay_time) {
-            pf0_tick = 0;
-            pf0_on = !pf0_on;
-            GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, pf0_on ? GPIO_PIN_0 : 0);
-        }
-    } else if (pf0_on || pf0_tick != 0) {
-        pf0_tick = 0;
-        pf0_on = false;
-        GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0);
+    if (UARTCommand_GetMode() == UART_MODE_LOCAL) {
+        PF0_UpdateLocalMode();
+    } else {
+        PF0_UpdateUartMode();
     }
 
     char_pos = (window_pos + index) % str_len;

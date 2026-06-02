@@ -33,6 +33,12 @@ void LED_Flash(enum SPEEDLEVEL speed_level);
 void SetScrollSpeed(enum SPEEDLEVEL level);
 bool SetDisplayText(const char *text);
 void SetScrollDelayMs(uint32_t delay_ms);
+void PF0_UpdateLocalMode(void);
+void PF0_UpdateUartMode(void);
+void PF0_ResetLocalMode(void);
+void PF0_ResetUartMode(void);
+void PF0_RecordUartCommandSuccess(void);
+void PF0_RecordUartCommandError(void);
 void MoveWindow(void);
 uint8_t Seg7Code_FromAscii(char ch);
 
