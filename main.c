@@ -24,6 +24,7 @@ int main(void) {
     SetScrollSpeed(speed_level);
 
     while (1) {
+        UARTCommand_Process();
         main_control_loop();
     }
 }
@@ -48,9 +49,9 @@ void S800_GPIO_Init(void) {
 void DelayMs(uint32_t ms) { SysCtlDelay((SysCtlClockGet() / 3000) * ms); }
 
 uint32_t SystemClock_PLL(void) {
-    // PLL 20 MHz
+    // PLL 120 MHz
     uint32_t freq =
-            SysCtlClockFreqSet(SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480 | SYSCTL_XTAL_25MHZ, 20000000);
+            SysCtlClockFreqSet(SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480 | SYSCTL_XTAL_25MHZ, 120000000);
     return freq;
 }
 
