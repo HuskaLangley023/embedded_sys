@@ -16,6 +16,8 @@ int main(void) {
     S800_I2C0_Init();
     S800_UART_Init();
 
+    IntPrioritySet(FAULT_SYSTICK, 0x00);
+    IntPrioritySet(INT_UART0, 0x80);
     IntEnable(INT_UART0);
     UARTIntEnable(UART0_BASE, UART_INT_RX | UART_INT_RT);
 

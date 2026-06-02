@@ -3,6 +3,8 @@ project(lab1 C)
 
 set(CMAKE_C_STANDARD 11)
 
+add_compile_definitions(PART_TM4C1294NCPDT)
+
 include_directories(driverlib)
 include_directories(inc)
 include_directories(RTE/_Target_1)

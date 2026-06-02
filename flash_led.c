@@ -3,13 +3,10 @@
 //
 #include "flash_led.h"
 
-uint32_t pj0_val = 0;
-uint32_t pj1_val = 0;
-
 volatile uint8_t index = 0;
 
-uint8_t str_buffer[] = "s523010910148zhuyixiao";
-uint8_t str_len = sizeof(str_buffer) - 1U;
+uint8_t str_buffer[DISPLAY_BUFFER_MAX_LEN + 1U] = "s523010910148zhuyixiao";
+volatile uint8_t str_len = sizeof("s523010910148zhuyixiao") - 1U;
 volatile int8_t dir = 1;
 volatile uint8_t window_pos = 0;
 
@@ -63,6 +60,48 @@ void SetScrollSpeed(enum SPEEDLEVEL level) {
     GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0);
 }
 
+bool SetDisplayText(const char *text) {
+    uint32_t len = 0;
+
+    while (text[len] != '\0') {
+        len++;
+        if (len > SEG7_DIGITS || len > DISPLAY_BUFFER_MAX_LEN) {
+            return false;
+        }
+    }
+
+    if (len == 0U) {
+        return false;
+    }
+
+    SysTickIntDisable();
+    memcpy(str_buffer, text, len);
+    str_buffer[len] = '\0';
+    str_len = (uint8_t) len;
+    window_pos = 0;
+    index = 0;
+    SysTickIntEnable();
+
+    return true;
+}
+
+void SetScrollDelayMs(uint32_t delay_ms) {
+    delay_time = delay_ms;
+
+    if (delay_ms == FAST_SCROLL_TIME_MS) {
+        speed_level = FAST;
+    } else if (delay_ms == SLOW_SCROLL_TIME_MS) {
+        speed_level = SLOW;
+    } else if (delay_ms == STOP_SCROLL_TIME_MS) {
+        speed_level = STOP;
+    }
+
+    scroll_tick = 0;
+    pf0_tick = 0;
+    pf0_on = false;
+    GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0);
+}
+
 uint8_t Seg7Code_FromAscii(char ch) {
     switch (ch) {
         case '0':
@@ -85,24 +124,57 @@ uint8_t Seg7Code_FromAscii(char ch) {
             return 0x7f; // 0b01111111
         case '9':
             return 0x6f; // 0b01101111
-        case 'z':
-            return 0x5b; // close to 2
-        case 'h':
-            return 0x74;
-        case 'u':
-            return 0x1c;
-        case 'y':
-            return 0x6e;
-        case 'i':
-            return 0x04;
-        case 'x':
-            return 0x76; // close to H
+        case 'A':
         case 'a':
             return 0x77;
+        case 'B':
+        case 'b':
+            return 0x7c;
+        case 'C':
+        case 'c':
+            return 0x39;
+        case 'D':
+        case 'd':
+            return 0x5e;
+        case 'E':
+        case 'e':
+            return 0x79;
+        case 'F':
+        case 'f':
+            return 0x71;
+        case 'H':
+        case 'h':
+            return 0x74;
+        case 'I':
+        case 'i':
+            return 0x04;
+        case 'L':
+        case 'l':
+            return 0x38;
+        case 'O':
         case 'o':
             return 0x5c;
+        case 'S':
         case 's':
             return 0x6d; // close to 5
+        case 'U':
+        case 'u':
+            return 0x1c;
+        case 'X':
+        case 'x':
+            return 0x76; // close to H
+        case 'Y':
+        case 'y':
+            return 0x6e;
+        case 'Z':
+        case 'z':
+            return 0x5b; // close to 2
+        case '-':
+            return 0x40;
+        case '_':
+            return 0x08;
+        case ' ':
+            return 0x00;
         default:
             return 0x00; // ����ʾ
     }

@@ -7,6 +7,8 @@
 #include "s800_uart.h"
 
 void SysTick_Handler(void) {
+    uint8_t char_pos;
+
     time_flag_1ms = true;
 
     if (delay_time != STOP_SCROLL_TIME_MS) {
@@ -30,7 +32,7 @@ void SysTick_Handler(void) {
         GPIOPinWrite(GPIO_PORTF_BASE, GPIO_PIN_0, 0);
     }
 
-    uint8_t char_pos = (window_pos + index) % str_len;
+    char_pos = (window_pos + index) % str_len;
 
     I2C0_WriteByte(TCA6424_I2CADDR, TCA6424_OUTPUT_PORT2, 0x00);
     // Delay(1);
@@ -49,19 +51,15 @@ uint32_t rx_buf;
 void UART0_Handler(void)
 {
     int32_t uart0_int_status;
-    uart0_int_status 	= UARTIntStatus(UART0_BASE, true);
-    // 根据返回值uart0_int_status可以判断中断事件是接收中断、接收超时中断或发送中断等。详见本函数结束后的注释
-    //本例程只适用于接收最多8字节的情形，满足实验指导书的要求。
-    //若接收大于8字节例如10个字节，要在正常接收中断中接收8个字节，在超时接收中断中接收2个字节。
-    UARTIntClear(UART0_BASE, uart0_int_status);				//Clear the asserted interrupts
 
-    while(UARTCharsAvail(UART0_BASE))    		// Loop while there are characters in the receive FIFO.
-    {
-        ///Read the next character from the UART and write it back to the UART.
+    uart0_int_status = UARTIntStatus(UART0_BASE, true);
+    UARTIntClear(UART0_BASE, uart0_int_status);
+
+    while (UARTCharsAvail(UART0_BASE)) {
         rx_buf = UARTCharGetNonBlocking(UART0_BASE);
-        UARTCharPutNonBlocking(UART0_BASE, rx_buf);  //非阻塞方式UART接收和发送
-        GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1,GPIO_PIN_1 );
-        //		Delay(1000);
+        UARTCommand_RxByte((uint8_t) rx_buf);
+        GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1, GPIO_PIN_1);
     }
-    GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1,0 );
+
+    GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_1, 0);
 }

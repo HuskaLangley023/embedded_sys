@@ -7,13 +7,15 @@
 
 #include "main.h"
 
+#define DISPLAY_BUFFER_MAX_LEN 32U
+
 extern uint32_t pj0_val;
 extern uint32_t pj1_val;
 
 extern volatile uint8_t index;
 
 extern uint8_t str_buffer[];
-extern uint8_t str_len;
+extern volatile uint8_t str_len;
 extern volatile int8_t dir;
 extern volatile uint8_t window_pos;
 
@@ -29,6 +31,8 @@ extern enum SPEEDLEVEL speed_level;
 bool is_key_Pressed(uint32_t ui32Port, uint8_t ui8Pins);
 void LED_Flash(enum SPEEDLEVEL speed_level);
 void SetScrollSpeed(enum SPEEDLEVEL level);
+bool SetDisplayText(const char *text);
+void SetScrollDelayMs(uint32_t delay_ms);
 void MoveWindow(void);
 uint8_t Seg7Code_FromAscii(char ch);
 
