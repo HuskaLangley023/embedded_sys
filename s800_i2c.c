@@ -4,6 +4,7 @@
 #include "s800_i2c.h"
 
 void S800_I2C0_Init(void) {
+    uint32_t i2c_tpr;
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0); // ��ʼ��i2cģ��
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOB); // ʹ��I2Cģ��0����������ΪI2C0SCL--PB2��I2C0SDA--PB3
@@ -13,6 +14,8 @@ void S800_I2C0_Init(void) {
     GPIOPinTypeI2C(GPIO_PORTB_BASE, GPIO_PIN_3); // I2C��GPIO_PIN_3����SDA
 
     I2CMasterInitExpClk(I2C0_BASE, ui32SysClock, true); // config I2C0 400k
+    i2c_tpr = ((ui32SysClock + (20U * 1000000U) - 1U) / (20U * 1000000U)) - 1U;
+    HWREG(I2C0_BASE + I2C_O_MTPR) = i2c_tpr; // config I2C0 1MHz
     I2CMasterEnable(I2C0_BASE);
 
     I2C0_WriteByte(TCA6424_I2CADDR, TCA6424_CONFIG_PORT0, 0x0ff); // config port 0 as input
