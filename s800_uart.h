@@ -18,6 +18,8 @@ void UARTStringPutNonBlocking(const char *cMessage);
 void UARTCommand_RxByte(uint8_t byte);
 void UARTCommand_Process(void);
 uint8_t UARTCommand_GetMode(void);
+// void UARTHistory_ShowNext(void);
+// void UARTHistory_Clear(void);
 
 
 #endif //S800_UART_H

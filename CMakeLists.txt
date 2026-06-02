@@ -116,6 +116,7 @@ add_executable(lab1
         RTE/Device/TM4C1294NCPDT/system_TM4C129.c
         main.c
         callback.c
+        crc.c
         flash_led.c
         flash_led.h
         s800_i2c.h

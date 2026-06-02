@@ -221,6 +221,9 @@ uint8_t Seg7Code_FromAscii(char ch) {
         case 'F':
         case 'f':
             return 0x71;
+        case 'G':
+        case 'g':
+            return 0x3d;
         case 'H':
         case 'h':
             return 0x74;
@@ -230,12 +233,27 @@ uint8_t Seg7Code_FromAscii(char ch) {
         case 'L':
         case 'l':
             return 0x38;
+        case 'M':
+        case 'm':
+            return 0x37;
+        case 'N':
+        case 'n':
+            return 0x54;
         case 'O':
         case 'o':
             return 0x5c;
+        case 'P':
+        case 'p':
+            return 0x73;
+        case 'R':
+        case 'r':
+            return 0x50;
         case 'S':
         case 's':
             return 0x6d; // close to 5
+        case 'T':
+        case 't':
+            return 0x78;
         case 'U':
         case 'u':
             return 0x1c;

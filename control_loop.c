@@ -11,6 +11,9 @@ void main_control_loop(void) {
         time_flag_1ms = false;
 
         if (UARTCommand_GetMode() != UART_MODE_LOCAL) {
+            // if (is_key_Pressed(GPIO_PORTJ_BASE, GPIO_PIN_0)) {
+            //     UARTHistory_ShowNext();
+            // }
             return;
         }
 

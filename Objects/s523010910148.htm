@@ -3,9 +3,9 @@
 <title>Static Call Graph - [.\Objects\s523010910148.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\s523010910148.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060422: Last Updated: Tue Jun 02 12:13:34 2026
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060422: Last Updated: Tue Jun 02 13:17:00 2026
 <BR><P>
-<H3>Maximum Stack Usage =        192 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        200 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 __rt_entry_main &rArr; main &rArr; UARTCommand_Process &rArr; ExecuteCommand &rArr; SendStatus &rArr; FormatSpeed &rArr; UInt32ToDec
 <P>
@@ -269,8 +269,8 @@ Function Pointers
 Global Symbols
 </H3>
 <P><STRONG><a name="[7b]"></a>__main</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, __main.o(!!!main))
-<BR><BR>[Calls]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload
-<LI><a href="#[7d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry
+<BR><BR>[Calls]<UL><LI><a href="#[7d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry
+<LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload
 </UL>
 
 <P><STRONG><a name="[7c]"></a>__scatterload</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __scatter.o(!!!scatter))
@@ -360,8 +360,8 @@ Global Symbols
 <P><STRONG><a name="[10c]"></a>__rt_lib_shutdown_user_alloc_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, libshutdown2.o(.ARM.Collect$$libshutdown$$0000000C))
 
 <P><STRONG><a name="[7d]"></a>__rt_entry</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry.o(.ARM.Collect$$rtentry$$00000000))
-<BR><BR>[Called By]<UL><LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload_rt2
-<LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
+<BR><BR>[Called By]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
+<LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload_rt2
 </UL>
 
 <P><STRONG><a name="[10d]"></a>__rt_entry_presh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000002))
@@ -380,7 +380,7 @@ Global Symbols
 <P><STRONG><a name="[10e]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[86]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 192 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 200 + Unknown Stack Size
 <LI>Call Chain = __rt_entry_main &rArr; main &rArr; UARTCommand_Process &rArr; ExecuteCommand &rArr; SendStatus &rArr; FormatSpeed &rArr; UInt32ToDec
 </UL>
 <BR>[Calls]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -1378,8 +1378,8 @@ Global Symbols
 
 <P><STRONG><a name="[121]"></a>__semihosting_library_function</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, indicate_semi.o(.text), UNUSED)
 
-<P><STRONG><a name="[9f]"></a>DelayMs</STRONG> (Thumb, 26 bytes, Stack size 8 bytes, main.o(i.DelayMs))
-<BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = DelayMs &rArr; SysCtlClockGet
+<P><STRONG><a name="[9f]"></a>DelayMs</STRONG> (Thumb, 28 bytes, Stack size 16 bytes, main.o(i.DelayMs))
+<BR><BR>[Stack]<UL><LI>Max Depth = 28<LI>Call Chain = DelayMs &rArr; SysCtlClockGet
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysCtlDelay
 <LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysCtlClockGet
@@ -1465,7 +1465,7 @@ Global Symbols
 <LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Handler
 </UL>
 
-<P><STRONG><a name="[bd]"></a>I2C0_WriteByte</STRONG> (Thumb, 102 bytes, Stack size 24 bytes, s800_i2c.o(i.I2C0_WriteByte))
+<P><STRONG><a name="[bd]"></a>I2C0_WriteByte</STRONG> (Thumb, 110 bytes, Stack size 24 bytes, s800_i2c.o(i.I2C0_WriteByte))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = I2C0_WriteByte
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CMasterSlaveAddrSet
@@ -1527,49 +1527,59 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[de]"></a>MoveWindow</STRONG> (Thumb, 50 bytes, Stack size 0 bytes, flash_led.o(i.MoveWindow))
+<P><STRONG><a name="[de]"></a>MoveWindow</STRONG> (Thumb, 70 bytes, Stack size 0 bytes, flash_led.o(i.MoveWindow))
 <BR><BR>[Called By]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
 </UL>
 
-<P><STRONG><a name="[c6]"></a>PF0_RecordUartCommandError</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, flash_led.o(i.PF0_RecordUartCommandError))
-<BR><BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
+<P><STRONG><a name="[c6]"></a>PF0_RecordUartCommandError</STRONG> (Thumb, 26 bytes, Stack size 8 bytes, flash_led.o(i.PF0_RecordUartCommandError))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = PF0_RecordUartCommandError &rArr; PF0_Write
+</UL>
+<BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
 </UL>
 <BR>[Called By]<UL><LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTCommand_Process
 </UL>
 
-<P><STRONG><a name="[c8]"></a>PF0_RecordUartCommandSuccess</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, flash_led.o(i.PF0_RecordUartCommandSuccess))
-<BR><BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
+<P><STRONG><a name="[c8]"></a>PF0_RecordUartCommandSuccess</STRONG> (Thumb, 26 bytes, Stack size 8 bytes, flash_led.o(i.PF0_RecordUartCommandSuccess))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = PF0_RecordUartCommandSuccess &rArr; PF0_Write
+</UL>
+<BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
 </UL>
 <BR>[Called By]<UL><LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTCommand_Process
 </UL>
 
-<P><STRONG><a name="[ab]"></a>PF0_ResetLocalMode</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, flash_led.o(i.PF0_ResetLocalMode))
-<BR><BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
+<P><STRONG><a name="[aa]"></a>PF0_ResetLocalMode</STRONG> (Thumb, 14 bytes, Stack size 8 bytes, flash_led.o(i.PF0_ResetLocalMode))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = PF0_ResetLocalMode &rArr; PF0_Write
+</UL>
+<BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
 </UL>
 <BR>[Called By]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 </UL>
 
-<P><STRONG><a name="[a9]"></a>PF0_ResetUartMode</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, flash_led.o(i.PF0_ResetUartMode))
-<BR><BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
+<P><STRONG><a name="[ab]"></a>PF0_ResetUartMode</STRONG> (Thumb, 22 bytes, Stack size 8 bytes, flash_led.o(i.PF0_ResetUartMode))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = PF0_ResetUartMode &rArr; PF0_Write
+</UL>
+<BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
 </UL>
 <BR>[Called By]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 </UL>
 
-<P><STRONG><a name="[c9]"></a>PF0_UpdateLocalMode</STRONG> (Thumb, 56 bytes, Stack size 0 bytes, flash_led.o(i.PF0_UpdateLocalMode))
-<BR><BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
-</UL>
-<BR>[Called By]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
-</UL>
-
-<P><STRONG><a name="[ca]"></a>PF0_UpdateUartMode</STRONG> (Thumb, 124 bytes, Stack size 16 bytes, flash_led.o(i.PF0_UpdateUartMode))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = PF0_UpdateUartMode
+<P><STRONG><a name="[c9]"></a>PF0_UpdateLocalMode</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, flash_led.o(i.PF0_UpdateLocalMode))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = PF0_UpdateLocalMode &rArr; PF0_Write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
 </UL>
 
-<P><STRONG><a name="[cd]"></a>S800_GPIO_Init</STRONG> (Thumb, 112 bytes, Stack size 8 bytes, main.o(i.S800_GPIO_Init))
+<P><STRONG><a name="[ca]"></a>PF0_UpdateUartMode</STRONG> (Thumb, 148 bytes, Stack size 8 bytes, flash_led.o(i.PF0_UpdateUartMode))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = PF0_UpdateUartMode &rArr; PF0_Write
+</UL>
+<BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
+</UL>
+<BR>[Called By]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
+</UL>
+
+<P><STRONG><a name="[cd]"></a>S800_GPIO_Init</STRONG> (Thumb, 110 bytes, Stack size 8 bytes, main.o(i.S800_GPIO_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 44<LI>Call Chain = S800_GPIO_Init &rArr; GPIOPinTypeGPIOOutput &rArr; GPIOPadConfigSet
 </UL>
 <BR>[Calls]<UL><LI><a href="#[cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysCtlPeripheralReady
@@ -1581,8 +1591,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[d0]"></a>S800_I2C0_Init</STRONG> (Thumb, 136 bytes, Stack size 16 bytes, s800_i2c.o(i.S800_I2C0_Init))
-<BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = S800_I2C0_Init &rArr; GPIOPinTypeI2CSCL &rArr; GPIOPadConfigSet
+<P><STRONG><a name="[d0]"></a>S800_I2C0_Init</STRONG> (Thumb, 130 bytes, Stack size 8 bytes, s800_i2c.o(i.S800_I2C0_Init))
+<BR><BR>[Stack]<UL><LI>Max Depth = 44<LI>Call Chain = S800_I2C0_Init &rArr; GPIOPinTypeI2CSCL &rArr; GPIOPadConfigSet
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CMasterInitExpClk
 <LI><a href="#[d3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CMasterEnable
@@ -1605,7 +1615,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[d8]"></a>S800_UART_Init</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, s800_uart.o(i.S800_UART_Init))
+<P><STRONG><a name="[d8]"></a>S800_UART_Init</STRONG> (Thumb, 74 bytes, Stack size 8 bytes, s800_uart.o(i.S800_UART_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 44<LI>Call Chain = S800_UART_Init &rArr; GPIOPinTypeUART &rArr; GPIOPadConfigSet
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTConfigSetExpClk
@@ -1618,11 +1628,11 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[e0]"></a>Seg7Code_FromAscii</STRONG> (Thumb, 284 bytes, Stack size 0 bytes, flash_led.o(i.Seg7Code_FromAscii))
+<P><STRONG><a name="[e0]"></a>Seg7Code_FromAscii</STRONG> (Thumb, 290 bytes, Stack size 0 bytes, flash_led.o(i.Seg7Code_FromAscii))
 <BR><BR>[Called By]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
 </UL>
 
-<P><STRONG><a name="[ae]"></a>SetDisplayText</STRONG> (Thumb, 66 bytes, Stack size 16 bytes, flash_led.o(i.SetDisplayText))
+<P><STRONG><a name="[ae]"></a>SetDisplayText</STRONG> (Thumb, 72 bytes, Stack size 16 bytes, flash_led.o(i.SetDisplayText))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = SetDisplayText
 </UL>
 <BR>[Calls]<UL><LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTickIntDisable
@@ -1632,14 +1642,18 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 </UL>
 
-<P><STRONG><a name="[b0]"></a>SetScrollDelayMs</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, flash_led.o(i.SetScrollDelayMs))
-<BR><BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
+<P><STRONG><a name="[b0]"></a>SetScrollDelayMs</STRONG> (Thumb, 58 bytes, Stack size 8 bytes, flash_led.o(i.SetScrollDelayMs))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = SetScrollDelayMs &rArr; PF0_Write
+</UL>
+<BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
 </UL>
 <BR>[Called By]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 </UL>
 
-<P><STRONG><a name="[dd]"></a>SetScrollSpeed</STRONG> (Thumb, 44 bytes, Stack size 0 bytes, flash_led.o(i.SetScrollSpeed))
-<BR><BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
+<P><STRONG><a name="[dd]"></a>SetScrollSpeed</STRONG> (Thumb, 60 bytes, Stack size 8 bytes, flash_led.o(i.SetScrollSpeed))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = SetScrollSpeed &rArr; PF0_Write
+</UL>
+<BR>[Calls]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_Write
 </UL>
 <BR>[Called By]<UL><LI><a href="#[ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main_control_loop
 <LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -1685,8 +1699,8 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;S800_SysTick_Init
 </UL>
 
-<P><STRONG><a name="[b]"></a>SysTick_Handler</STRONG> (Thumb, 164 bytes, Stack size 24 bytes, callback.o(i.SysTick_Handler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = SysTick_Handler &rArr; I2C0_WriteByte
+<P><STRONG><a name="[b]"></a>SysTick_Handler</STRONG> (Thumb, 182 bytes, Stack size 16 bytes, callback.o(i.SysTick_Handler))
+<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = SysTick_Handler &rArr; I2C0_WriteByte
 </UL>
 <BR>[Calls]<UL><LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTCommand_GetMode
 <LI><a href="#[e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Seg7Code_FromAscii
@@ -1697,19 +1711,19 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_tm4c129.o(RESET)
 </UL>
-<P><STRONG><a name="[e1]"></a>SystemClock_PLL</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, main.o(i.SystemClock_PLL))
-<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = SystemClock_PLL &rArr; SysCtlClockFreqSet
+<P><STRONG><a name="[e1]"></a>SystemClock_PLL</STRONG> (Thumb, 16 bytes, Stack size 8 bytes, main.o(i.SystemClock_PLL))
+<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = SystemClock_PLL &rArr; SysCtlClockFreqSet
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysCtlClockFreqSet
 </UL>
 <BR>[Called By]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[79]"></a>SystemInit</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, system_tm4c129.o(i.SystemInit))
+<P><STRONG><a name="[79]"></a>SystemInit</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, system_tm4c129.o(i.SystemInit))
 <BR>[Address Reference Count : 1]<UL><LI> startup_tm4c129.o(.text)
 </UL>
-<P><STRONG><a name="[11]"></a>UART0_Handler</STRONG> (Thumb, 74 bytes, Stack size 16 bytes, callback.o(i.UART0_Handler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 28<LI>Call Chain = UART0_Handler &rArr; UARTCommand_RxByte
+<P><STRONG><a name="[11]"></a>UART0_Handler</STRONG> (Thumb, 70 bytes, Stack size 8 bytes, callback.o(i.UART0_Handler))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = UART0_Handler &rArr; UARTCommand_RxByte
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTIntStatus
 <LI><a href="#[e4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTIntClear
@@ -1740,10 +1754,10 @@ Global Symbols
 <LI><a href="#[ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main_control_loop
 </UL>
 
-<P><STRONG><a name="[e9]"></a>UARTCommand_Process</STRONG> (Thumb, 72 bytes, Stack size 80 bytes, s800_uart.o(i.UARTCommand_Process))
-<BR><BR>[Stack]<UL><LI>Max Depth = 192<LI>Call Chain = UARTCommand_Process &rArr; ExecuteCommand &rArr; SendStatus &rArr; FormatSpeed &rArr; UInt32ToDec
+<P><STRONG><a name="[e9]"></a>UARTCommand_Process</STRONG> (Thumb, 78 bytes, Stack size 80 bytes, s800_uart.o(i.UARTCommand_Process))
+<BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = UARTCommand_Process &rArr; ExecuteCommand &rArr; SendStatus &rArr; FormatSpeed &rArr; UInt32ToDec
 </UL>
-<BR>[Calls]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendLine
+<BR>[Calls]<UL><LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendLine
 <LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FetchCommand
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 <LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_RecordUartCommandSuccess
@@ -1752,8 +1766,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[87]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[e6]"></a>UARTCommand_RxByte</STRONG> (Thumb, 74 bytes, Stack size 12 bytes, s800_uart.o(i.UARTCommand_RxByte))
-<BR><BR>[Stack]<UL><LI>Max Depth = 12<LI>Call Chain = UARTCommand_RxByte
+<P><STRONG><a name="[e6]"></a>UARTCommand_RxByte</STRONG> (Thumb, 114 bytes, Stack size 8 bytes, s800_uart.o(i.UARTCommand_RxByte))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = UARTCommand_RxByte
 </UL>
 <BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Handler
 </UL>
@@ -1777,19 +1791,19 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Handler
 </UL>
 
-<P><STRONG><a name="[da]"></a>UARTStringPut</STRONG> (Thumb, 24 bytes, Stack size 16 bytes, s800_uart.o(i.UARTStringPut))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = UARTStringPut
+<P><STRONG><a name="[da]"></a>UARTStringPut</STRONG> (Thumb, 24 bytes, Stack size 8 bytes, s800_uart.o(i.UARTStringPut))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = UARTStringPut
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTCharPut
 </UL>
 <BR>[Called By]<UL><LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendStatus
 <LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendSpeed
-<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendLine
+<LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendLine
 <LI><a href="#[d8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;S800_UART_Init
 </UL>
 
-<P><STRONG><a name="[ea]"></a>is_key_Pressed</STRONG> (Thumb, 58 bytes, Stack size 16 bytes, flash_led.o(i.is_key_Pressed))
-<BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = is_key_Pressed &rArr; DelayMs &rArr; SysCtlClockGet
+<P><STRONG><a name="[ea]"></a>is_key_Pressed</STRONG> (Thumb, 60 bytes, Stack size 16 bytes, flash_led.o(i.is_key_Pressed))
+<BR><BR>[Stack]<UL><LI>Max Depth = 44<LI>Call Chain = is_key_Pressed &rArr; DelayMs &rArr; SysCtlClockGet
 </UL>
 <BR>[Calls]<UL><LI><a href="#[eb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIOPinRead
 <LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DelayMs
@@ -1797,8 +1811,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main_control_loop
 </UL>
 
-<P><STRONG><a name="[87]"></a>main</STRONG> (Thumb, 76 bytes, Stack size 0 bytes, main.o(i.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 192<LI>Call Chain = main &rArr; UARTCommand_Process &rArr; ExecuteCommand &rArr; SendStatus &rArr; FormatSpeed &rArr; UInt32ToDec
+<P><STRONG><a name="[87]"></a>main</STRONG> (Thumb, 78 bytes, Stack size 0 bytes, main.o(i.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = main &rArr; UARTCommand_Process &rArr; ExecuteCommand &rArr; SendStatus &rArr; FormatSpeed &rArr; UInt32ToDec
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ee]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main_control_loop
 <LI><a href="#[ed]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTIntEnable
@@ -1816,7 +1830,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
-<P><STRONG><a name="[ee]"></a>main_control_loop</STRONG> (Thumb, 96 bytes, Stack size 16 bytes, control_loop.o(i.main_control_loop))
+<P><STRONG><a name="[ee]"></a>main_control_loop</STRONG> (Thumb, 108 bytes, Stack size 8 bytes, control_loop.o(i.main_control_loop))
 <BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = main_control_loop &rArr; is_key_Pressed &rArr; DelayMs &rArr; SysCtlClockGet
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ea]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;is_key_Pressed
@@ -1837,12 +1851,14 @@ Global Symbols
 <H3>
 Local Symbols
 </H3>
-<P><STRONG><a name="[c7]"></a>PF0_Write</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, flash_led.o(i.PF0_Write))
-<BR><BR>[Calls]<UL><LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIOPinWrite
+<P><STRONG><a name="[c7]"></a>PF0_Write</STRONG> (Thumb, 20 bytes, Stack size 8 bytes, flash_led.o(i.PF0_Write))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = PF0_Write
+</UL>
+<BR>[Calls]<UL><LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIOPinWrite
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SetScrollDelayMs
-<LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_ResetUartMode
-<LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_ResetLocalMode
+<LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_ResetUartMode
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_ResetLocalMode
 <LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_RecordUartCommandSuccess
 <LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_RecordUartCommandError
 <LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_UpdateUartMode
@@ -1850,21 +1866,21 @@ Local Symbols
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SetScrollSpeed
 </UL>
 
-<P><STRONG><a name="[cc]"></a>AsciiIsDigit</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, s800_uart.o(i.AsciiIsDigit))
+<P><STRONG><a name="[cc]"></a>AsciiIsDigit</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, s800_uart.o(i.AsciiIsDigit))
 <BR><BR>[Called By]<UL><LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ParseSpeedMs
 </UL>
 
-<P><STRONG><a name="[a7]"></a>AsciiIsSpace</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, s800_uart.o(i.AsciiIsSpace))
+<P><STRONG><a name="[a7]"></a>AsciiIsSpace</STRONG> (Thumb, 18 bytes, Stack size 0 bytes, s800_uart.o(i.AsciiIsSpace))
 <BR><BR>[Called By]<UL><LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SkipSpaces
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 </UL>
 
-<P><STRONG><a name="[a2]"></a>AsciiToUpper</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, s800_uart.o(i.AsciiToUpper))
+<P><STRONG><a name="[a2]"></a>AsciiToUpper</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, s800_uart.o(i.AsciiToUpper))
 <BR><BR>[Called By]<UL><LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StartsWithIgnoreCase
 <LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EqualsIgnoreCase
 </UL>
 
-<P><STRONG><a name="[a1]"></a>EqualsIgnoreCase</STRONG> (Thumb, 58 bytes, Stack size 16 bytes, s800_uart.o(i.EqualsIgnoreCase))
+<P><STRONG><a name="[a1]"></a>EqualsIgnoreCase</STRONG> (Thumb, 60 bytes, Stack size 16 bytes, s800_uart.o(i.EqualsIgnoreCase))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = EqualsIgnoreCase
 </UL>
 <BR>[Calls]<UL><LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AsciiToUpper
@@ -1872,29 +1888,29 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 </UL>
 
-<P><STRONG><a name="[a3]"></a>ExecuteCommand</STRONG> (Thumb, 298 bytes, Stack size 24 bytes, s800_uart.o(i.ExecuteCommand))
-<BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = ExecuteCommand &rArr; SendStatus &rArr; FormatSpeed &rArr; UInt32ToDec
+<P><STRONG><a name="[a3]"></a>ExecuteCommand</STRONG> (Thumb, 308 bytes, Stack size 16 bytes, s800_uart.o(i.ExecuteCommand))
+<BR><BR>[Stack]<UL><LI>Max Depth = 120<LI>Call Chain = ExecuteCommand &rArr; SendStatus &rArr; FormatSpeed &rArr; UInt32ToDec
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ValidateDisplayText
 <LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;StartsWithIgnoreCase
 <LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SkipSpaces
 <LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendStatus
 <LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendSpeed
-<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendLine
+<LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendLine
 <LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ParseSpeedMs
-<LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ParseModeParam
+<LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ParseModeParam
 <LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;EqualsIgnoreCase
 <LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AsciiIsSpace
 <LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SetScrollDelayMs
 <LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SetDisplayText
-<LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_ResetUartMode
-<LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_ResetLocalMode
+<LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_ResetUartMode
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PF0_ResetLocalMode
 </UL>
 <BR>[Called By]<UL><LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTCommand_Process
 </UL>
 
-<P><STRONG><a name="[b1]"></a>FetchCommand</STRONG> (Thumb, 92 bytes, Stack size 24 bytes, s800_uart.o(i.FetchCommand))
-<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = FetchCommand
+<P><STRONG><a name="[b1]"></a>FetchCommand</STRONG> (Thumb, 110 bytes, Stack size 32 bytes, s800_uart.o(i.FetchCommand))
+<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = FetchCommand
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IntDisable
 <LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;IntEnable
@@ -1902,8 +1918,8 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTCommand_Process
 </UL>
 
-<P><STRONG><a name="[b4]"></a>FormatSpeed</STRONG> (Thumb, 200 bytes, Stack size 40 bytes, s800_uart.o(i.FormatSpeed))
-<BR><BR>[Stack]<UL><LI>Max Depth = 64<LI>Call Chain = FormatSpeed &rArr; UInt32ToDec
+<P><STRONG><a name="[b4]"></a>FormatSpeed</STRONG> (Thumb, 224 bytes, Stack size 56 bytes, s800_uart.o(i.FormatSpeed))
+<BR><BR>[Stack]<UL><LI>Max Depth = 80<LI>Call Chain = FormatSpeed &rArr; UInt32ToDec
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UInt32ToDec
 </UL>
@@ -1911,16 +1927,16 @@ Local Symbols
 <LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendSpeed
 </UL>
 
-<P><STRONG><a name="[c5]"></a>OnlySpacesLeft</STRONG> (Thumb, 18 bytes, Stack size 8 bytes, s800_uart.o(i.OnlySpacesLeft))
+<P><STRONG><a name="[c5]"></a>OnlySpacesLeft</STRONG> (Thumb, 24 bytes, Stack size 8 bytes, s800_uart.o(i.OnlySpacesLeft))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = OnlySpacesLeft &rArr; SkipSpaces
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SkipSpaces
 </UL>
 <BR>[Called By]<UL><LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ParseSpeedMs
-<LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ParseModeParam
+<LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ParseModeParam
 </UL>
 
-<P><STRONG><a name="[a8]"></a>ParseModeParam</STRONG> (Thumb, 42 bytes, Stack size 16 bytes, s800_uart.o(i.ParseModeParam))
+<P><STRONG><a name="[a9]"></a>ParseModeParam</STRONG> (Thumb, 48 bytes, Stack size 16 bytes, s800_uart.o(i.ParseModeParam))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = ParseModeParam &rArr; OnlySpacesLeft &rArr; SkipSpaces
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SkipSpaces
@@ -1929,8 +1945,8 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 </UL>
 
-<P><STRONG><a name="[af]"></a>ParseSpeedMs</STRONG> (Thumb, 204 bytes, Stack size 40 bytes, s800_uart.o(i.ParseSpeedMs))
-<BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = ParseSpeedMs &rArr; OnlySpacesLeft &rArr; SkipSpaces
+<P><STRONG><a name="[af]"></a>ParseSpeedMs</STRONG> (Thumb, 204 bytes, Stack size 32 bytes, s800_uart.o(i.ParseSpeedMs))
+<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = ParseSpeedMs &rArr; OnlySpacesLeft &rArr; SkipSpaces
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SkipSpaces
 <LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OnlySpacesLeft
@@ -1939,8 +1955,8 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 </UL>
 
-<P><STRONG><a name="[aa]"></a>SendLine</STRONG> (Thumb, 16 bytes, Stack size 8 bytes, s800_uart.o(i.SendLine))
-<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = SendLine &rArr; UARTStringPut
+<P><STRONG><a name="[a8]"></a>SendLine</STRONG> (Thumb, 18 bytes, Stack size 8 bytes, s800_uart.o(i.SendLine))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = SendLine &rArr; UARTStringPut
 </UL>
 <BR>[Calls]<UL><LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTStringPut
 </UL>
@@ -1949,7 +1965,7 @@ Local Symbols
 </UL>
 
 <P><STRONG><a name="[a5]"></a>SendSpeed</STRONG> (Thumb, 30 bytes, Stack size 24 bytes, s800_uart.o(i.SendSpeed))
-<BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = SendSpeed &rArr; FormatSpeed &rArr; UInt32ToDec
+<BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = SendSpeed &rArr; FormatSpeed &rArr; UInt32ToDec
 </UL>
 <BR>[Calls]<UL><LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTStringPut
 <LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FormatSpeed
@@ -1957,8 +1973,8 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 </UL>
 
-<P><STRONG><a name="[a4]"></a>SendStatus</STRONG> (Thumb, 54 bytes, Stack size 24 bytes, s800_uart.o(i.SendStatus))
-<BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = SendStatus &rArr; FormatSpeed &rArr; UInt32ToDec
+<P><STRONG><a name="[a4]"></a>SendStatus</STRONG> (Thumb, 56 bytes, Stack size 24 bytes, s800_uart.o(i.SendStatus))
+<BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = SendStatus &rArr; FormatSpeed &rArr; UInt32ToDec
 </UL>
 <BR>[Calls]<UL><LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTStringPut
 <LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FormatSpeed
@@ -1972,7 +1988,7 @@ Local Symbols
 <BR>[Calls]<UL><LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AsciiIsSpace
 </UL>
 <BR>[Called By]<UL><LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ParseSpeedMs
-<LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ParseModeParam
+<LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ParseModeParam
 <LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OnlySpacesLeft
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 </UL>
@@ -1985,13 +2001,13 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 </UL>
 
-<P><STRONG><a name="[b5]"></a>UInt32ToDec</STRONG> (Thumb, 90 bytes, Stack size 24 bytes, s800_uart.o(i.UInt32ToDec))
+<P><STRONG><a name="[b5]"></a>UInt32ToDec</STRONG> (Thumb, 106 bytes, Stack size 24 bytes, s800_uart.o(i.UInt32ToDec))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = UInt32ToDec
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FormatSpeed
 </UL>
 
-<P><STRONG><a name="[ad]"></a>ValidateDisplayText</STRONG> (Thumb, 30 bytes, Stack size 0 bytes, s800_uart.o(i.ValidateDisplayText))
+<P><STRONG><a name="[ad]"></a>ValidateDisplayText</STRONG> (Thumb, 32 bytes, Stack size 0 bytes, s800_uart.o(i.ValidateDisplayText))
 <BR><BR>[Called By]<UL><LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ExecuteCommand
 </UL>
 <P>

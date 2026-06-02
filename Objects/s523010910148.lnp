@@ -1,6 +1,7 @@
 --cpu=Cortex-M4.fp.sp
 ".\objects\main.o"
 ".\objects\callback.o"
+".\objects\crc.o"
 ".\objects\control_loop.o"
 ".\objects\flash_led.o"
 ".\objects\s800_i2c.o"
