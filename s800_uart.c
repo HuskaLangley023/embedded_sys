@@ -8,9 +8,9 @@
 
 #define UART_CMD_MAX_LEN 64U
 #define UART_SPEED_MAX_MS 9999U
-// #define UART_HISTORY_DEPTH 10U
-// #define UART_HISTORY_CMD_LEN UART_CMD_MAX_LEN
-// #define UART_CRC_HEX_LEN 4U
+#define UART_HISTORY_DEPTH 10U
+#define UART_HISTORY_CMD_LEN UART_CMD_MAX_LEN
+#define UART_CRC_HEX_LEN 4U
 
 static volatile char uart_cmd_buf[UART_CMD_MAX_LEN + 1U];
 static volatile uint32_t uart_cmd_len = 0;
@@ -20,12 +20,11 @@ static volatile bool uart_cmd_overflow_ready = false;
 
 static volatile uint8_t uart_mode = UART_MODE_LOCAL;
 
-// static char uart_history[UART_HISTORY_DEPTH][UART_HISTORY_CMD_LEN + 1U];
-// static uint8_t uart_history_count = 0;
-// static uint8_t uart_history_next = 0;
-// static uint8_t uart_history_browse_offset = 0;
-//
-// static void SendLine(const char *message);
+static char uart_history[UART_HISTORY_DEPTH][UART_HISTORY_CMD_LEN + 1U];
+static uint8_t uart_history_count = 0;
+static uint8_t uart_history_next = 0;
+
+static void SendLine(const char *message);
 
 static bool AsciiIsSpace(char ch)
 {
@@ -117,6 +116,161 @@ static void UInt32ToDec(uint32_t value, char *buf, uint32_t buf_size)
         divisor /= 10U;
     }
     buf[pos] = '\0';
+}
+
+static void CopyStringLimited(char *dst, const char *src, uint32_t dst_size)
+{
+    uint32_t pos;
+
+    if (dst_size == 0U) {
+        return;
+    }
+
+    pos = 0U;
+    while ((src[pos] != '\0') && ((pos + 1U) < dst_size)) {
+        dst[pos] = src[pos];
+        pos++;
+    }
+    dst[pos] = '\0';
+}
+
+static int8_t HexDigitValue(char ch)
+{
+    if ((ch >= '0') && (ch <= '9')) {
+        return (int8_t)(ch - '0');
+    }
+    if ((ch >= 'a') && (ch <= 'f')) {
+        return (int8_t)(ch - 'a' + 10);
+    }
+    if ((ch >= 'A') && (ch <= 'F')) {
+        return (int8_t)(ch - 'A' + 10);
+    }
+    return -1;
+}
+
+static bool ParseHex16(const char *text, uint16_t *value)
+{
+    uint8_t pos;
+    int8_t digit;
+    uint16_t parsed;
+
+    parsed = 0U;
+    for (pos = 0U; pos < UART_CRC_HEX_LEN; pos++) {
+        digit = HexDigitValue(text[pos]);
+        if (digit < 0) {
+            return false;
+        }
+        parsed = (uint16_t)((parsed << 4) | (uint16_t)digit);
+    }
+
+    if (!OnlySpacesLeft(text + UART_CRC_HEX_LEN)) {
+        return false;
+    }
+
+    *value = parsed;
+    return true;
+}
+
+static bool StripAndVerifyChecksum(char *command)
+{
+    uint32_t body_len;
+    uint16_t received_crc;
+    uint16_t calculated_crc;
+    char *caret;
+
+    caret = command;
+    while ((*caret != '\0') && (*caret != '^')) {
+        caret++;
+    }
+
+    if (*caret == '\0') {
+        return true;
+    }
+
+    body_len = (uint32_t)(caret - command);
+    if (!ParseHex16(caret + 1, &received_crc)) {
+        return false;
+    }
+
+    calculated_crc = CRC16_Calc((uint8_t *)command, body_len);
+    if (calculated_crc != received_crc) {
+        return false;
+    }
+
+    command[body_len] = '\0';
+    return true;
+}
+
+static const char *HistoryGetRecent(uint8_t offset)
+{
+    uint8_t history_index;
+
+    if (offset >= uart_history_count) {
+        return 0;
+    }
+
+    history_index = (uint8_t)((uart_history_next + UART_HISTORY_DEPTH - 1U - offset) % UART_HISTORY_DEPTH);
+    return uart_history[history_index];
+}
+
+static void HistoryClear(void)
+{
+    uart_history_count = 0U;
+    uart_history_next = 0U;
+}
+
+static void HistoryAdd(const char *command)
+{
+    CopyStringLimited(uart_history[uart_history_next], command, UART_HISTORY_CMD_LEN + 1U);
+
+    uart_history_next++;
+    if (uart_history_next >= UART_HISTORY_DEPTH) {
+        uart_history_next = 0U;
+    }
+
+    if (uart_history_count < UART_HISTORY_DEPTH) {
+        uart_history_count++;
+    }
+}
+
+static bool ShouldRecordHistory(const char *command)
+{
+    if (command[0] == '\0') {
+        return false;
+    }
+
+    if (EqualsIgnoreCase(command, "GET HISTORY")) {
+        return false;
+    }
+
+    if (EqualsIgnoreCase(command, "CLR HISTORY") || EqualsIgnoreCase(command, "CLEAR HISTORY")) {
+        return false;
+    }
+
+    return true;
+}
+
+static void HistorySendAll(void)
+{
+    uint8_t offset;
+    char number[4];
+    const char *record;
+
+    SendLine("HISTORY:");
+    if (uart_history_count == 0U) {
+        SendLine("EMPTY");
+        return;
+    }
+
+    offset = 0U;
+    while (offset < uart_history_count) {
+        record = HistoryGetRecent(offset);
+        UInt32ToDec((uint32_t)offset + 1U, number, sizeof(number));
+        UARTStringPut(number);
+        UARTStringPut(":");
+        SendLine(record);
+        offset++;
+    }
 }
 //
 // static uint32_t StringLength(const char *text)
@@ -483,16 +637,16 @@ static void SendSpeed(void)
 
 static bool ExecuteCommand(const char *command)
 {
-    // if (EqualsIgnoreCase(command, "GET HISTORY")) {
-    //     HistorySendAll();
-    //     return true;
-    // }
-    //
-    // if (EqualsIgnoreCase(command, "CLR HISTORY") || EqualsIgnoreCase(command, "CLEAR HISTORY")) {
-    //     UARTHistory_Clear();
-    //     SendLine("OK");
-    //     return true;
-    // }
+    if (EqualsIgnoreCase(command, "GET HISTORY")) {
+        HistorySendAll();
+        return true;
+    }
+
+    if (EqualsIgnoreCase(command, "CLR HISTORY") || EqualsIgnoreCase(command, "CLEAR HISTORY")) {
+        HistoryClear();
+        SendLine("OK");
+        return true;
+    }
 
     if (EqualsIgnoreCase(command, "GET STATUS")) {
         SendStatus();
@@ -671,18 +825,18 @@ void UARTCommand_Process(void)
         return;
     }
 
-    // if (!StripAndVerifyChecksum(command)) {
-    //     SendLine("ERROR: CHECKSUM");
-    //     if (uart_mode == UART_MODE_CONTROL) {
-    //         PF0_RecordUartCommandError();
-    //     }
-    //     return;
-    // }
+    if (!StripAndVerifyChecksum(command)) {
+        SendLine("ERROR: CHECKSUM");
+        if (uart_mode == UART_MODE_CONTROL) {
+            PF0_RecordUartCommandError();
+        }
+        return;
+    }
 
     command_ok = ExecuteCommand(command);
-    // if (command_ok && ShouldRecordHistory(command)) {
-    //     HistoryAdd(command);
-    // }
+    if (command_ok && ShouldRecordHistory(command)) {
+        HistoryAdd(command);
+    }
 
     if (uart_mode == UART_MODE_CONTROL) {
         if (command_ok) {
